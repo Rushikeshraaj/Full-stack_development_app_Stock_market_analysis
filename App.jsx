@@ -1,33 +1,76 @@
-import Header from "./component/header";
-import Footer from "./component/footer";
-import StockCard from "./component/stockcard";
-import "./App.css";
+// src/components/Watchlist.jsx  (or pages/Watchlist.jsx)
+import { useState } from 'react';
 
-const stocks = [
-  { symbol: "RELIANCE", price: "2,850.40", change: 1.25, volume: "4.2M" },
-  { symbol: "TCS", price: "3,850.20", change: -0.45, volume: "1.8M" },
-  { symbol: "INFY", price: "1,520.75", change: 0.87, volume: "3.4M" },
-  { symbol: "HDFCBANK", price: "1,680.30", change: 0.31, volume: "2.1M" },
-]
+function Watchlist() {
+  // 1. State for the list of stocks
+  const [stocks, setStocks] = useState([
+    { id: 1, symbol: 'TCS', price: 3850.20 }
+  ]);
 
-function App() {
+  // 2. State for controlled form inputs
+  const [symbol, setSymbol] = useState('');
+  const [price, setPrice] = useState('');
+
+  // 3. Add a new stock
+  const addStock = () => {
+    if (!symbol || !price) return; // simple validation
+
+    setStocks([
+      ...stocks,
+      {
+        id: Date.now(),               // unique id
+        symbol: symbol.toUpperCase(),
+        price: parseFloat(price)
+      }
+    ]);
+
+    // clear the form
+    setSymbol('');
+    setPrice('');
+  };
+
+  // 4. Remove a stock by id
+  const removeStock = (id) => {
+    setStocks(stocks.filter(s => s.id !== id));
+  };
+
   return (
-    <div className="app">
-      <Header title="Available Stocks" />
-      <main className="list">
+    <div className="watchlist">
+      <h2>My Watchlist (Live State)</h2>
+
+      {/* Controlled Form */}
+      <div className="add-form">
+        <input
+          type="text"
+          placeholder="Symbol (e.g. RELIANCE)"
+          value={symbol}
+          onChange={(e) => setSymbol(e.target.value)}
+        />
+        <input
+          type="number"
+          placeholder="Price"
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
+        />
+        <button onClick={addStock}>Add Stock</button>
+      </div>
+
+      {/* Live count */}
+      <p>Current watchlist items (state): {stocks.length}</p>
+
+      {/* List of stocks */}
+      <ul>
         {stocks.map((stock) => (
-          <StockCard
-            key={stock.symbol}
-            symbol={stock.symbol}
-            price={stock.price}
-            change={stock.change}
-            volume={stock.volume}
-          />
+          <li key={stock.id}>
+            {stock.symbol} – ₹{stock.price.toFixed(2)}
+            <button onClick={() => removeStock(stock.id)}>
+              Remove
+            </button>
+          </li>
         ))}
-      </main>
-      <Footer text="Reusable StockCard component | React + Vite" />
+      </ul>
     </div>
-  )
+  );
 }
 
-export default App
+export default Watchlist;
