@@ -1,76 +1,50 @@
-// src/components/Watchlist.jsx  (or pages/Watchlist.jsx)
-import { useState } from 'react';
+// src/components/StockList.jsx
+import { useState, useEffect } from 'react';
 
-function Watchlist() {
-  // 1. State for the list of stocks
-  const [stocks, setStocks] = useState([
-    { id: 1, symbol: 'TCS', price: 3850.20 }
-  ]);
+function StockList() {
+  // 1. State for stocks and loading
+  const [stocks, setStocks] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // 2. State for controlled form inputs
-  const [symbol, setSymbol] = useState('');
-  const [price, setPrice] = useState('');
+  // 2. useEffect – runs only on mount (empty dependency array)
+  useEffect(() => {
+    // Simulate API call with setTimeout
+    const timer = setTimeout(() => {
+      setStocks([
+        { id: 1, symbol: 'RELIANCE', price: 2850.40, change: 1.25 },
+        { id: 2, symbol: 'TCS', price: 3850.20, change: -0.45 }
+      ]);
+      setLoading(false);
+    }, 1500); // 1.5 second delay
 
-  // 3. Add a new stock
-  const addStock = () => {
-    if (!symbol || !price) return; // simple validation
+    // 3. Cleanup function – runs when component unmounts
+    return () => clearTimeout(timer);
+  }, []); // empty array → run only once on mount
 
-    setStocks([
-      ...stocks,
-      {
-        id: Date.now(),               // unique id
-        symbol: symbol.toUpperCase(),
-        price: parseFloat(price)
-      }
-    ]);
+  // 4. Conditional rendering while loading
+  if (loading) {
+    return <p>Loading market data...</p>;
+  }
 
-    // clear the form
-    setSymbol('');
-    setPrice('');
-  };
-
-  // 4. Remove a stock by id
-  const removeStock = (id) => {
-    setStocks(stocks.filter(s => s.id !== id));
-  };
-
+  // 5. Render the list after data is loaded
   return (
-    <div className="watchlist">
-      <h2>My Watchlist (Live State)</h2>
-
-      {/* Controlled Form */}
-      <div className="add-form">
-        <input
-          type="text"
-          placeholder="Symbol (e.g. RELIANCE)"
-          value={symbol}
-          onChange={(e) => setSymbol(e.target.value)}
-        />
-        <input
-          type="number"
-          placeholder="Price"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-        />
-        <button onClick={addStock}>Add Stock</button>
-      </div>
-
-      {/* Live count */}
-      <p>Current watchlist items (state): {stocks.length}</p>
-
-      {/* List of stocks */}
+    <div className="stock-list">
+      <h2>Market Data (loaded with useEffect)</h2>
       <ul>
         {stocks.map((stock) => (
           <li key={stock.id}>
-            {stock.symbol} – ₹{stock.price.toFixed(2)}
-            <button onClick={() => removeStock(stock.id)}>
-              Remove
-            </button>
+            {stock.symbol} – ₹{stock.price.toFixed(2)}{' '}
+            <span style={{ color: stock.change >= 0 ? 'green' : 'red' }}>
+              {stock.change >= 0 ? '+' : ''}{stock.change}%
+            </span>
           </li>
         ))}
       </ul>
+      <p style={{ fontSize: '0.9rem', color: '#666' }}>
+        Loaded on mount via useEffect • Cleanup function demonstrated on unmount
+      </p>
     </div>
   );
 }
 
-export default Watchlist;
+export default StockList;
