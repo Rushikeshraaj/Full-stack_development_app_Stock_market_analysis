@@ -14,7 +14,7 @@ function App() {
       <BrowserRouter>
         <div className="app">
           <Header title="Stock Market Analysis" />
-          <nav className="navbar">
+          <nav className="navbar" aria-label="Main navigation">
             <NavLink to="/" end>Home</NavLink>
             <NavLink to="/markets">Markets</NavLink>
             <NavLink to="/watchlist">Watchlist</NavLink>
@@ -26,6 +26,7 @@ function App() {
               <Route path="/markets" element={<Markets />} />
               <Route path="/watchlist" element={<WatchlistPage />} />
               <Route path="/portfolio" element={<Portfolio />} />
+              <Route path="*" element={<section><h2>Page not found</h2><NavLink to="/">Return Home</NavLink></section>} />
             </Routes>
           </main>
           <Footer text="© 2026 Stock Market Analysis Platform" />
